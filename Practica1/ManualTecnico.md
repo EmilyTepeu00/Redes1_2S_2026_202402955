@@ -21,7 +21,13 @@ Este manual documenta el diseño de la infraestructura física de Capa 1 del Mod
 | 1 | Rack/Gabinete | MDF (Data Center) | Dimensionado según equipo a alojar |
 | 1 | UPS | MDF (Data Center) | Capacidad por definir |
 
-### 2.2 Dispositivos Finales (Hosts)
+### 2.2 Justificación de cada elemento de equipo activo
+
+- **Switch de departamento (x8):** concentra las conexiones de los hosts (PCs, laptops, servidores) de cada área en un único punto, para que compartan un solo enlace troncal hacia el MDF en lugar de que cada host tuviera su propio cable individual atravesando todo el edificio. Esto reduce la cantidad de cable troncal necesario y facilita el mantenimiento por segmento.
+- **Switch Central (MDF):** agrega el tráfico que viene de los 8 switches de departamento y sirve como punto único de interconexión de toda la red interna antes de salir hacia el router/firewall perimetral. Es el equipo que permite que todos los departamentos se comuniquen entre si y con el exterior.
+- **Patch Panel (48 puertos):** actúa como punto de terminación fijo y organizado para todos los cables troncales que llegan al MDF, separando físicamente el cableado de infraestructura (fijo, hacia las paredes) de las conexiones activas (patch cords cortos hacia el switch central), lo que facilita el mantenimiento y evita manipular directamente el cableado empotrado cada vez que se reconfigura una conexión.
+
+### 2.3 Dispositivos Finales (Hosts)
 
 | Departamento | PCs Escritorio | Laptops | Servidores | Total Puntos de Red |
 |---|---|---|---|---|
@@ -205,6 +211,20 @@ Todos los enlaces de cableado horizontal (hosts ↔ switch de departamento) util
 
 Los enlaces troncales conectan switch con switch (mismo tipo), lo cual tradicionalmente requeriría un cable **crossover**. Pero los switches modernos cuentan con la función **Auto-MDI/MDIX**, que detecta automáticamente el tipo de conexión y ajusta la señal internamente. Por eso **se utilizan cables straight-through también en los enlaces troncales**, lo que simplifica el inventario de cableado teniendo un solo tipo de cable para todo el edificio sin sacrificar funcionalidad.
 
+### 8.2.1 Tabla de tipo de cable por enlace
+
+| Enlace | Tipo de cable | Justificación |
+|---|---|---|
+| MDF-Recepción | Straight-through | Switch-switch con Auto-MDIX |
+| MDF-RRHH | Straight-through | Switch-switch con Auto-MDIX |
+| MDF-Legal | Straight-through | Switch-switch con Auto-MDIX |
+| MDF-Capacitación | Straight-through | Switch-switch con Auto-MDIX |
+| MDF-Diseño | Straight-through | Switch-switch con Auto-MDIX |
+| MDF-Dirección | Straight-through | Switch-switch con Auto-MDIX |
+| MDF-Backend | Straight-through | Switch-switch con Auto-MDIX |
+| MDF-Data Center | Straight-through | Switch-switch con Auto-MDIX |
+| Todos los enlaces horizontales (host ↔ switch) | Straight-through | Host-switch, uso estándar del cable |
+
 La disposición de pines de ambos tipos de cable es la siguiente:
 
 ### 8.3 Disposición de Pines — Cable Straight-Through (T568B en ambos extremos)
@@ -283,7 +303,20 @@ Con un consumo activo estimado de 116 W aproximadamente y considerando margen de
 - **Cableado horizontal:** `[Departamento]-[Número de Punto de Red]` — Ejemplo: `Recepcion-PR01`, `RRHH-PR05`.
 - **Cableado troncal:** `MDF-[Departamento]` — Ejemplo: `MDF-Backend`, `MDF-Capacitacion`.
 
-### 12.2 Comparación con el estándar TIA/EIA-606
+### 12.2 Tabla de etiquetado de cables
+
+| Departamento | Etiquetas de cableado horizontal | Etiqueta de cableado troncal |
+|---|---|---|
+| Recepción | Recepcion-PR01 a Recepcion-PR04 | MDF-Recepcion |
+| Recursos Humanos | RRHH-PR01 a RRHH-PR08 | MDF-RRHH |
+| Legal | Legal-PR01 a Legal-PR04 | MDF-Legal |
+| Sala de Capacitación | Capacitacion-PR01 a Capacitacion-PR10 | MDF-Capacitacion |
+| Diseño e Innovación | Diseno-PR01 a Diseno-PR08 | MDF-Diseno |
+| Dirección General | Direccion-PR01 a Direccion-PR04 | MDF-Direccion |
+| Backend | Backend-PR01 a Backend-PR07 | MDF-Backend |
+| Data Center | DataCenter-PR01 a DataCenter-PR03 | MDF-DataCenter |
+
+### 12.3 Comparación con el estándar TIA/EIA-606
 
 El estándar **TIA/EIA-606** (Administración de Infraestructura de Telecomunicaciones) exige un sistema de identificación más completo que el esquema simplificado usado en esta práctica. Tiene 2 diferencias concretas:
 

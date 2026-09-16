@@ -445,3 +445,32 @@ Para compensar la necesidad de mayor capacidad en los enlaces críticos (servido
 | Protocolo EtherChannel | PAgP (carnet impar) |
 | Protocolo STP | Rapid-PVST (carnet impar) |
 | Banner MOTD | Acceso Restringido - TechPark_202402955 |
+
+---
+
+## 16. Alcance Opcional — Inspección de Tramas STP y VTP
+
+Con el Modo Simulación de Cisco Packet Tracer, se filtraron únicamente los protocolos STP y VTP para capturar y analizar 2 tramas para comprender el funcionamiento interno de estos protocolos de Capa 2.
+
+![Event List filtrada STP y VTP](Imagenes/12_lista_eventos_stp_vtp.png)
+
+### 16.1 PDU de STP (BPDU)
+
+Se abrió una BPDU capturada en el switch `ID-SW3`, identificando los siguientes campos dentro del encabezado RSTP 802.1w:
+
+- **Root ID: 24621 / 0002.160B.DC69** — Prioridad y dirección MAC del switch Root Bridge del dominio (`Core-DC`).
+- **Bridge ID: 32813 / 00D0.9763.8087** — Identidad del switch que generó este BPDU específico (`ID-SW3`), con una prioridad más alta que la del Root, confirmando que no es la raíz del árbol.
+- **Root Path Cost: 12** — Costo acumulado del camino más corto desde `ID-SW3` hasta el Root Bridge.
+
+![PDU de STP - detalle BPDU](Imagenes/13_bpdu_stp.png)
+
+### 16.2 PDU de VTP
+
+Se abrió una trama VTP capturada en el switch `Corp-Ala-A`, enviada desde `Corp-Dist`. En el resumen de Capa 2 (Dot1q Header, LLC SNAP VTP Summary Frame) se identificaron los siguientes campos:
+
+- **VTP Domain Name: Smart_5**
+- **Configuration Revision Number: 10**
+
+Esto confirma que las actualizaciones de VLANs se propagan correctamente por todo el dominio VTP, coincidiendo con el número de revisión mostrado previamente en `show vtp status` (sección 9).
+
+![PDU de VTP - detalle](Imagenes/14_pdu_vtp.png)
